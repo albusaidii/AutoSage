@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Widgets/garage_list_item.dart';
 import '../utils/theme.dart';
 
 class GarageScreen extends StatelessWidget {
@@ -6,19 +7,24 @@ class GarageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // sample list of garages (static)
+    // list of garages (static)
     final garages = [
-      {'name': 'Al-Hilal Auto Repair', 'distance': '2.1 km', 'price': 'PKR 800'},
-      {'name': 'Speedy Garage', 'distance': '3.3 km', 'price': 'PKR 1,000'},
-      {'name': 'City Auto Care', 'distance': '4.0 km', 'price': 'PKR 1,200'},
+      {'name': 'Al-Hilal Auto Repair', 'distance': '2.1 km'},
+      {'name': 'Speedy Garage', 'distance': '3.3 km'},
+      {'name': 'City Auto Care', 'distance': '4.0 km'},
+      {'name': 'Pro Tech Auto', 'distance': '5.5 km'}, // Added more for demonstration
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Nearby Garages',
-        style: TextStyle(
-        color: Colors.white,      // Sets the text color to white
-        fontWeight: FontWeight.bold, // Makes the text bolder
-      ),), backgroundColor: primaryColor),
+      appBar: AppBar(
+        title: const Text('Nearby Garages',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: primaryColor,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -30,34 +36,25 @@ class GarageScreen extends StatelessWidget {
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Center(child: Icon(Icons.map, size: 64, color: Colors.grey)),
+              child: const Center(child: Icon(Icons.map_outlined, size: 64, color: Colors.grey)),
             ),
             const SizedBox(height: 14),
             Expanded(
               child: ListView.separated(
                 itemCount: garages.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, __) => const SizedBox(height: 4), // Reduced separator height
                 itemBuilder: (context, i) {
                   final g = garages[i];
-                  return Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: ListTile(
-                      leading: CircleAvatar(backgroundColor: primaryColor.withOpacity(0.12), child: const Icon(Icons.build, color: primaryColor)),
-                      title: Text(g['name']!),
-                      subtitle: Text(g['distance']!),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(g['price']!, style: const TextStyle(fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 4),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(backgroundColor: primaryColor, minimumSize: const Size(80, 30)),
-                            child: const Text('Book', style: TextStyle(fontSize: 12)),
-                          ),
-                        ],
-                      ),
-                    ),
+                  // 2. Use the new GarageListItem widget
+                  return GarageListItem(
+                    name: g['name']!,
+                    distance: g['distance']!,
+                    onTap: () {
+                      // TODO: Implement navigation or action for this garage
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Tapped on ${g['name']}')),
+                      );
+                    },
                   );
                 },
               ),

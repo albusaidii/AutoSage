@@ -1,6 +1,7 @@
 import 'package:autosageapp/screens/sparepart_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/feature_card.dart';
+import 'cars_screen.dart';
 import 'chatbot_screen.dart';
 import 'garage_screen.dart';
 import 'history_screen.dart';
@@ -36,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   InkWell(
-                    onTap: onProfileTap, // ✅ Calls the callback from MainPage
+                    onTap: onProfileTap, //  Calls the callback from MainPage
                     customBorder: const CircleBorder(),
                     child: CircleAvatar(
                       radius: 22,
@@ -78,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CarsScreen())),
                         icon: const Icon(Icons.arrow_forward_ios, color: accentColor),
                       )
                     ],
