@@ -1,60 +1,98 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../Widgets/garage_list_item.dart';
-import '../utils/theme.dart';
+import 'package:http/http.dart' as http;
 
-class GarageScreen extends StatelessWidget {
+import '../Widgets/garage_list_item.dart';
+import 'garage_detail_screen.dart';
+
+class GarageScreen extends StatefulWidget {
   const GarageScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // list of garages (static)
-    final garages = [
-      {'name': 'Al-Hilal Auto Repair', 'distance': '2.1 km'},
-      {'name': 'Speedy Garage', 'distance': '3.3 km'},
-      {'name': 'City Auto Care', 'distance': '4.0 km'},
-      {'name': 'Pro Tech Auto', 'distance': '5.5 km'}, // Added more for demonstration
-    ];
+  State<GarageScreen> createState() => _GarageScreenState();
+}
 
+class _GarageScreenState extends State<GarageScreen> {
+  List garages = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchGarages();
+  }
+
+  Future<void> fetchGarages() async {
+    try {
+      final res = await http.get(
+        Uri.parse("http://10.0.2.2:3000/api/garages"),
+      );
+
+      if (res.statusCode == 200) {
+        setState(() {
+          garages = jsonDecode(res.body);
+          isLoading = false;
+        });
+      } else {
+        isLoading = false;
+      }
+    } catch (_) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nearby Garages',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: primaryColor,
-      ),
+      appBar: AppBar(title: const Text("Nearby Garages")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Placeholder for map area
-            Container(
+            // Map placeholder
+            SizedBox(
               height: 180,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Center(child: Icon(Icons.map_outlined, size: 64, color: Colors.grey)),
+              child: Image.asset('lib/images/map.png'),
             ),
             const SizedBox(height: 14),
+
+            // Content
             Expanded(
-              child: ListView.separated(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : garages.isEmpty
+                  ? const Center(child: Text("No garages available"))
+                  : ListView.separated(
                 itemCount: garages.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 4), // Reduced separator height
+                separatorBuilder: (_, __) =>
+                const SizedBox(height: 6),
                 itemBuilder: (context, i) {
                   final g = garages[i];
-                  // 2. Use the new GarageListItem widget
+
+                  // IMPORTANT: backend returns 0 / 1
+                  final bool isActive = g['is_active'] == 1;
+
                   return GarageListItem(
-                    name: g['name']!,
-                    distance: g['distance']!,
-                    onTap: () {
-                      // TODO: Implement navigation or action for this garage
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Tapped on ${g['name']}')),
+                    name: g['name'],
+                    isActive: isActive,
+                    onTap: isActive
+                        ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              GarageDetailScreen(
+                                garageName: g['name'],
+                                address: g['address'],
+                                directionsUrl:
+                                g['maps_url'] ?? g['address'],
+                                phoneNumber:
+                                g['phone'] ?? '',
+                              ),
+                        ),
                       );
-                    },
+                    }
+                        : null, // 🚫 disabled garages blocked
                   );
                 },
               ),

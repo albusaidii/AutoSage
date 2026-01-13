@@ -30,11 +30,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.1.0
+  shared_preferences: ^2.2.2
+  fl_chart: ^0.66.0
+
 
 
   google_fonts: ^4.0.3
   cupertino_icons: ^1.0.8
-  url_launcher: ^6.3.0
+  url_launcher: ^6.2.6
+  provider: ^6.1.5+1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -59,6 +64,7 @@ dev_dependencies:
 flutter:
   assets:
     - C:/Users/USER/AutoSage/autosageapp/lib/images/logo.png
+    - C:\Users\USER\AutoSage\autosageapp\lib\images/map.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

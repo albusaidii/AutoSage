@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'admin_screen.dart';
+
 // A placeholder for the actual admin panel screen
 class AdminPanelScreen extends StatelessWidget {
   const AdminPanelScreen({super.key});
@@ -28,15 +30,14 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _passwordController = TextEditingController();
 
   void _login() {
-    // In a real app, you would validate this against a secure source.
-    // For this example, we'll use a simple hard-coded password.
+    // ADMIN PAGE PASSWORD
     const String adminPassword = 'admin';
 
     if (_formKey.currentState!.validate()) {
       if (_passwordController.text == adminPassword) {
-        // Navigate to the admin panel on successful login
+        // Navigates to the admin panel on successful login
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const AdminPanelScreen()),
+          MaterialPageRoute(builder: (context) => const AdminScreen()),
         );
       } else {
         // Show an error message for incorrect password

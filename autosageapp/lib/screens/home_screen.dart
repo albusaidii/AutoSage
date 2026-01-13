@@ -1,128 +1,353 @@
 import 'package:autosageapp/screens/sparepart_screen.dart';
 import 'package:flutter/material.dart';
-import '../widgets/feature_card.dart';
-import 'cars_screen.dart';
 import 'chatbot_screen.dart';
 import 'garage_screen.dart';
 import 'history_screen.dart';
-import '../utils/theme.dart';
+// REMOVED: import '../utils/theme.dart'; (No longer needed for hard-coded colors)
+
+// Data model for the tips section
+class Tip {
+  final String title;
+  final IconData icon;
+  final Color color;
+
+  const Tip({required this.title, required this.icon, required this.color});
+}
 
 class HomeScreen extends StatelessWidget {
   final VoidCallback? onProfileTap;
-  const HomeScreen({super.key, this.onProfileTap});
+  final String fullName;
+  const HomeScreen({
+    super.key,
+    this.onProfileTap,
+    // 2. Add fullName to the constructor and make it required
+    required this.fullName,
+  });
 
+
+  // Sample data for the tips list
+  final List<Tip> _tips = const [
+    Tip(
+        title: 'Check your tire pressure monthly for better fuel economy.',
+        icon: Icons.air,
+        color: Colors.lightBlue),
+    Tip(
+        title: 'Rotate your tires every 10,000 km to ensure even wear.',
+        icon: Icons.sync,
+        color: Colors.orange),
+    Tip(
+        title: 'Keep an emergency kit in your car for unexpected situations.',
+        icon: Icons.medical_services_outlined,
+        color: Colors.redAccent),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: scaffoldBg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Hi, Hamed 👋',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text('What would you like AutoSage to do today?',
-                            style: TextStyle(color: Colors.grey)),
-                      ],
-                    ),
-                  ),
-                  InkWell(
-                    onTap: onProfileTap, //  Calls the callback from MainPage
-                    customBorder: const CircleBorder(),
-                    child: CircleAvatar(
-                      radius: 22,
-                      backgroundColor: primaryColor,
-                      child: const Icon(Icons.person, color: Colors.white),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 26),
+    // Determine if the current theme is dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-              // Car summary card (visual emphasis)
-              Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                elevation: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Row(
-                    children: [
-                      // placeholder image: add your asset or keep Icon
-                      Container(
-                        width: 90,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.directions_car, color: primaryColor, size: 44),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Jeep Wrangler 2021', style: TextStyle(fontWeight: FontWeight.bold)),
-                            SizedBox(height: 4),
-                            Text('3.6L V6, Automatic', style: TextStyle(color: Colors.grey)),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CarsScreen())),
-                        icon: const Icon(Icons.arrow_forward_ios, color: accentColor),
-                      )
-                    ],
+    return Scaffold(
+      // 1. REMOVED: The hard-coded background color.
+      // It will now automatically use the scaffoldBackgroundColor from your theme.
+      // backgroundColor: const Color(0xFFF8F9FA),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // --- Top Header ---
+                _buildHeader(context, isDark),
+                const SizedBox(height: 30),
+
+                // --- Main Action: Diagnose Issue ---
+                _buildPrimaryActionCard(context, isDark),
+                const SizedBox(height: 30),
+
+                // --- Secondary Actions ---
+                Text(
+                  'Quick Actions',
+                  // 2. UPDATED: Text color now adapts to the theme.
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+                const SizedBox(height: 16),
+                _buildSecondaryActionRow(context, isDark),
+                const SizedBox(height: 30),
+
+                // --- Recent Activity / History Section ---
+                Text(
+                  'Recent Activity',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildHistoryCard(context, isDark),
+
+                // --- "Tips & Insights" section ---
+                const SizedBox(height: 30),
+                Text(
+                  'Tips & Insights',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildTipsList(isDark),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Builder Methods ---
+
+  Widget _buildHeader(BuildContext context, bool isDark) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 3. Use the fullName variable in the Text widget
+            Text('Hi, $fullName 👋',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                )),
+            const SizedBox(height: 6),
+            Text('Welcome to your command center.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: isDark ? Colors.grey[400] : Colors.grey[700],
+                )),
+          ],
+        ),
+        InkWell(
+          onTap: onProfileTap,
+          customBorder: const CircleBorder(),
+          child: CircleAvatar(
+            radius: 24,
+            // 4. UPDATED: Profile icon background and color adapt to the theme.
+            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+            child: Icon(Icons.person,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                size: 26),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildPrimaryActionCard(BuildContext context, bool isDark) {
+    return _ThemedCard(
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const ChatbotScreen())),
+      isDark: isDark,
+      gradient: const LinearGradient(
+        colors: [Color(0xFF00AEEF), Color(0xFF0072B5)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.psychology_outlined, color: Colors.white, size: 40),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('AI Diagnosis',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
+                SizedBox(height: 4),
+                Text('Tap to analyze vehicle issues.',
+                    style: TextStyle(color: Colors.white70)),
+              ],
+            ),
+          ),
+          Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSecondaryActionRow(BuildContext context, bool isDark) {
+    return Row(
+      children: [
+        Expanded(
+          child: _ThemedCard(
+            onTap: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const GarageScreen())),
+            isDark: isDark,
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6F00F4), Color(0xFFA055FF)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.store_mall_directory_outlined,
+                    color: Colors.white, size: 32),
+                SizedBox(height: 8),
+                Text('Garages',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _ThemedCard(
+            onTap: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const SparePartScreen())),
+            isDark: isDark,
+            gradient: const LinearGradient(
+              colors: [Color(0xFFE84D7A), Color(0xFFFF8A8A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.build_circle_outlined, color: Colors.white, size: 32),
+                SizedBox(height: 8),
+                Text('Spare Parts',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHistoryCard(BuildContext context, bool isDark) {
+    return _ThemedCard(
+      onTap: () => Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
+      isDark: isDark,
+      gradient: LinearGradient(
+        colors: [
+          Colors.green.shade700,
+          Colors.green.shade500,
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.history_edu_outlined, color: Colors.white, size: 40),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Vehicle History',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
+                SizedBox(height: 4),
+                Text('View all service records.',
+                    style: TextStyle(color: Colors.white70)),
+              ],
+            ),
+          ),
+          Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTipsList(bool isDark) {
+    return ListView.builder(
+      itemCount: _tips.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        final tip = _tips[index];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            // 5. UPDATED: Tip card color and border adapt to the theme.
+            color: isDark ? const Color(0xFF1F1F1F) : Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: tip.color.withOpacity(0.15),
+                child: Icon(tip.icon, color: tip.color, size: 22),
               ),
-
-              const SizedBox(height: 22),
-
-              // Grid: features
+              const SizedBox(width: 16),
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 18,
-                  mainAxisSpacing: 18,
-                  children: [
-                    FeatureCard(
-                      icon: Icons.quiz,
-                      label: 'Diagnose Issue',
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatbotScreen())),
-                    ),
-                    FeatureCard(
-                      icon: Icons.map_outlined,
-                      label: 'Find Garage',
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GarageScreen())),
-                    ),
-                    FeatureCard(
-                      icon: Icons.history_toggle_off,
-                      label: 'My History',
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
-                    ),
-                    FeatureCard(
-                      icon: Icons.build_circle_outlined,
-                      label: 'Spare Parts',
-                      // This is the updated part
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SparePartScreen())),
-                    ),
-                  ],
+                // 6. UPDATED: Tip text color adapts to the theme.
+                child: Text(
+                  tip.title,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+}
+
+// Renamed and updated the card to be theme-aware
+class _ThemedCard extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  final Gradient gradient;
+  final bool isDark;
+
+  const _ThemedCard({
+    required this.child,
+    required this.onTap,
+    required this.gradient,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: gradient,
+          // 7. UPDATED: Shadow adapts to the theme.
+          boxShadow: isDark
+              ? null // No shadow in dark mode for a flatter look
+              : [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
+        child: child,
       ),
     );
   }

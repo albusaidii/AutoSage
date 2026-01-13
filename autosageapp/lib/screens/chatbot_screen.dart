@@ -1,100 +1,228 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../utils/theme.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
+
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
 }
 
 class _ChatbotScreenState extends State<ChatbotScreen> {
-  final List<Map<String, String>> _messages = [
-    {'role': 'bot', 'text': 'Hi! Describe the issue (e.g., "engine noise when accelerating").'},
-  ];
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
-  void _send() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    setState(() {
-      _messages.add({'role': 'user', 'text': text});
-      // Dummy bot reply - replace with real API call later
-      _messages.add({'role': 'bot', 'text': 'Thanks — I think this might be a tire or suspension issue. Tap Diagnose.'});
-    });
-    _controller.clear();
+  List<Map<String, String>> messages = [];
+  bool isLoading = false;
+
+  // ✅ Helper: detect numeric-only input
+  bool _isNumericOnly(String text) {
+    return RegExp(r'^\s*\d+\s*$').hasMatch(text);
   }
 
-  Widget _bubble(Map<String, String> msg) {
-    final bool isUser = msg['role'] == 'user';
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-        decoration: BoxDecoration(
-          color: isUser ? primaryColor : Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(14),
-            topRight: const Radius.circular(14),
-            bottomLeft: Radius.circular(isUser ? 14 : 2),
-            bottomRight: Radius.circular(isUser ? 2 : 14),
-          ),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(1,2))],
-        ),
-        child: Text(
-          msg['text'] ?? '',
-          style: TextStyle(color: isUser ? Colors.white : Colors.black87),
-        ),
-      ),
-    );
+  Future<void> sendMessage() async {
+    final trimmed = _controller.text.trim();
+    if (trimmed.isEmpty) return;
+
+    // BLOCK numeric-only messages
+    if (_isNumericOnly(trimmed)) {
+      setState(() {
+        messages.add({
+          "sender": "bot",
+          "text": "Please describe the issue using words, not only numbers.",
+        });
+      });
+      _controller.clear();
+      _scrollToBottom();
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt("userId");
+
+    if (userId == null) {
+      throw Exception("User not logged in");
+    }
+
+
+    final userMessage = trimmed;
+    _controller.clear();
+
+    setState(() {
+      messages.add({"sender": "user", "text": userMessage});
+      isLoading = true;
+    });
+    _scrollToBottom();
+
+    try {
+      final response = await http.post(
+        Uri.parse("http://10.0.2.2:3000/api/diagnose"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "user_id": userId, // placeholder
+          "message": userMessage,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["diagnosis"] != null &&
+            data["diagnosis"]["description"] != null) {
+          setState(() {
+            messages.add({
+              "sender": "bot",
+              "text": data["diagnosis"]["description"],
+            });
+          });
+        } else {
+          setState(() {
+            messages.add({
+              "sender": "bot",
+              "text": "Sorry, I received an unusual response from the server.",
+            });
+          });
+        }
+      } else {
+        final errorData = jsonDecode(response.body);
+        setState(() {
+          messages.add({
+            "sender": "bot",
+            "text": errorData["error"] ?? "An unknown server error occurred.",
+          });
+        });
+      }
+    } catch (_) {
+      setState(() {
+        messages.add({
+          "sender": "bot",
+          "text":
+          "Could not connect to the server. Please check your network connection.",
+        });
+      });
+    } finally {
+      setState(() => isLoading = false);
+      _scrollToBottom();
+    }
+
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AutoSage Chat',
-          style: TextStyle(
-          color: Colors.white,      // Sets the text color to white
-          fontWeight: FontWeight.bold, // Makes the text bolder
-        ),),
-        backgroundColor: primaryColor,
+        title: const Text("AutoSage Chatbot"),
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, i) => _bubble(_messages[i]),
-            ),
-          ),
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: 'Describe the issue or choose a quick option...',
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              controller: _scrollController,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final msg = messages[index];
+                final isUser = msg["sender"] == "user";
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+
+                return Align(
+                  alignment:
+                  isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isUser
+                          ? Theme.of(context)
+                          .primaryColor
+                          .withOpacity(0.9)
+                          : (isDark
+                          ? const Color(0xFF373737)
+                          : Colors.grey[300]),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      msg["text"]!,
+                      style: TextStyle(
+                        color: isUser
+                            ? Colors.white
+                            : (isDark ? Colors.white : Colors.black),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _send,
-                  style: ElevatedButton.styleFrom(backgroundColor: primaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                  child: const Icon(Icons.send, color: Colors.white),
-                ),
-              ],
+                );
+              },
             ),
+          ),
+
+          if (isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  SizedBox(width: 12),
+                  Text("Diagnosing issue..."),
+                ],
+              ),
+            ),
+
+          _buildChatInput(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChatInput() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      color: isDark ? const Color(0xFF1F1F1F) : Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              onSubmitted: (_) => sendMessage(),
+              style: const TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                hintText: "Describe your car's issue...",
+                hintStyle: TextStyle(color: Colors.grey[600]),
+                filled: true,
+                fillColor: isDark ? Colors.grey[800] : Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.send_rounded),
+            color: Theme.of(context).primaryColor,
+            onPressed: sendMessage,
           ),
         ],
       ),

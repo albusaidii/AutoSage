@@ -1,97 +1,163 @@
+import 'dart:convert';
 import 'package:autosageapp/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:autosageapp/screens/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 import 'edit_profile.dart';
 import 'help_support_screen.dart';
-import 'notifications_screen.dart'; // Make sure this import is correct
+import 'notifications_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final String baseUrl = "http://10.0.2.2:3000/api";
+
+  String fullName = "";
+  String email = "";
+  int unreadNotificationsCount = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAllUserData();
+  }
+
+  // =========================
+  // LOAD USER + NOTIFICATION COUNT
+  // =========================
+  Future<void> _loadAllUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt("userId");
+
+      if (userId == null) return;
+
+      final res =
+      await http.get(Uri.parse("$baseUrl/notifications/$userId"));
+
+      int unreadCount = 0;
+      if (res.statusCode == 200) {
+        final List data = jsonDecode(res.body);
+        unreadCount = data.where((n) => n["is_read"] == 0).length;
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        fullName = prefs.getString("fullName") ?? "Unknown User";
+        email = prefs.getString("email") ?? "No email";
+        unreadNotificationsCount = unreadCount;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Profile load error: $e");
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  // =========================
+  // LOGOUT
+  // =========================
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    if (!mounted) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (_) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Use the theme's background color
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blue, // Or your primary theme color
-        automaticallyImplyLeading: false, // Hide back button on a main screen
+        backgroundColor: const Color(0xFF0072B5),
+        automaticallyImplyLeading: false,
       ),
-      body: ListView(
-        children: [
-          // HEADER SECTION
-          const UserAccountsDrawerHeader(
-            accountName: Text(
-              "Sheldon Cooper",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+        onRefresh: _loadAllUserData,
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(
+                fullName,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
+              accountEmail: Text(email),
+              currentAccountPicture: const CircleAvatar(
+                child: Icon(Icons.person, color: Colors.grey, size: 30),
+              ),
+              decoration:
+              const BoxDecoration(color: Color(0xFF0072B5)),
             ),
-            accountEmail: Text("sheldon.cooper@caltech.edu"),
-            currentAccountPicture: CircleAvatar(
-              backgroundImage: NetworkImage(
-                  "https://i.pinimg.com/736x/1b/62/22/1b6222355866184a5699b350f29a73e4.jpg"),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.blue, // Match with AppBar color
-            ),
-          ),
-
-          // MENU SECTION
-          _buildProfileMenu(context),
-        ],
+            _buildProfileMenu(context),
+          ],
+        ),
       ),
     );
   }
 
-  // Extracted widget for the profile menu to keep the build method clean
+  // =========================
+  // MENU
+  // =========================
   Widget _buildProfileMenu(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
+    return Padding(
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           ProfileMenuItem(
             icon: Icons.person_outline,
             title: 'Edit Profile',
-            onTap: () {
-              // Navigate to the EditProfileScreen
-              Navigator.push(
+            onTap: () async {
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
               );
+              _loadAllUserData();
             },
           ),
           ProfileMenuItem(
             icon: Icons.settings_outlined,
             title: 'Settings',
             onTap: () {
-              // Navigate to the SettingsScreen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
               );
             },
           ),
           ProfileMenuItem(
             icon: Icons.notifications_outlined,
             title: 'Notifications',
-            onTap: () {
-              Navigator.push(
+            unreadCount: unreadNotificationsCount,
+            onTap: () async {
+              await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                MaterialPageRoute(
+                    builder: (_) => const NotificationScreen()),
               );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Navigate to Notifications')),
-              );
+              _loadAllUserData();
             },
           ),
           const Divider(),
@@ -99,24 +165,18 @@ class ProfileScreen extends StatelessWidget {
             icon: Icons.help_outline,
             title: 'Help & Support',
             onTap: () {
-              // 2. Navigate to HelpSupportScreen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
+                MaterialPageRoute(
+                    builder: (_) => const HelpSupportScreen()),
               );
             },
           ),
           ProfileMenuItem(
             icon: Icons.logout,
             title: 'Logout',
-            textColor: Colors.red, // Make logout text stand out
-            onTap: () {
-              // Navigate to LoginScreen and remove all previous routes
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                    (Route<dynamic> route) => false,
-              );
-            },
+            textColor: Colors.red,
+            onTap: () => _logout(context),
           ),
         ],
       ),
@@ -124,12 +184,15 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-// A reusable widget for menu items to avoid code duplication
+// =========================
+// MENU ITEM
+// =========================
 class ProfileMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
   final Color? textColor;
+  final int? unreadCount;
 
   const ProfileMenuItem({
     super.key,
@@ -137,15 +200,36 @@ class ProfileMenuItem extends StatelessWidget {
     required this.title,
     required this.onTap,
     this.textColor,
+    this.unreadCount,
   });
 
   @override
   Widget build(BuildContext context) {
+    final hasUnread = unreadCount != null && unreadCount! > 0;
+
     return ListTile(
-      leading: Icon(icon, color: textColor ?? Theme.of(context).iconTheme.color),
-      title: Text(
-        title,
-        style: TextStyle(color: textColor ?? Theme.of(context).textTheme.bodyLarge?.color),
+      leading: Icon(icon, color: textColor),
+      title: Row(
+        children: [
+          Text(title, style: TextStyle(color: textColor)),
+          if (hasUnread) const SizedBox(width: 8),
+          if (hasUnread)
+            Container(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                unreadCount.toString(),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+        ],
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,

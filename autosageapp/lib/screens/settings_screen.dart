@@ -1,5 +1,10 @@
+import 'dart:convert';
 import 'package:autosageapp/screens/privacy_security_screen.dart';
+import 'package:autosageapp/utils/theme_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'edit_profile.dart';
 
@@ -11,99 +16,107 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // State variables for the settings
   bool _pushNotifications = true;
-  bool _emailNotifications = false;
-  String _theme = 'System';
+  int? _userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationPreference();
+  }
+
+  Future<void> _loadNotificationPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getInt("userId");
+
+    if (_userId == null) return;
+
+    final res = await http.get(
+      Uri.parse("http://10.0.2.2:3000/api/settings/notifications/$_userId"),
+    );
+
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body);
+      setState(() {
+        _pushNotifications = data["enabled"] == true;
+      });
+    }
+  }
+
+  Future<void> _updateNotificationPreference(bool value) async {
+    if (_userId == null) return;
+
+    setState(() => _pushNotifications = value);
+
+    await http.put(
+      Uri.parse("http://10.0.2.2:3000/api/settings/notifications/$_userId"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"enabled": value}),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
-          // Section for Account Settings
           _buildSectionHeader('Account'),
           _buildSettingsTile(
             icon: Icons.person_outline,
             title: 'Edit Profile',
-            subtitle: 'Update your name, email, and password',
+            subtitle: 'Update your name, email, and phone',
             onTap: () {
-              // Navigate to the EditProfileScreen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
               );
             },
           ),
-          // ... inside the build method
-
           _buildSettingsTile(
             icon: Icons.lock_outline,
             title: 'Privacy & Security',
             subtitle: 'Manage your data and account security',
             onTap: () {
-              // Navigate to the PrivacySecurityScreen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PrivacySecurityScreen()),
+                MaterialPageRoute(builder: (_) => const PrivacySecurityScreen()),
               );
             },
           ),
 
-          // ...
-
-
           const Divider(),
 
-          // Section for Notifications
           _buildSectionHeader('Notifications'),
-          _buildSwitchTile(
-            title: 'Push Notifications',
-            subtitle: 'Receive alerts from the app',
+          SwitchListTile(
+            title: const Text("Receive Notifications"),
+            subtitle: const Text("Allow messages from AutoSage"),
             value: _pushNotifications,
-            onChanged: (value) {
-              setState(() {
-                _pushNotifications = value;
-              });
-            },
-          ),
-          _buildSwitchTile(
-            title: 'Email Notifications',
-            subtitle: 'Receive summaries and alerts via email',
-            value: _emailNotifications,
-            onChanged: (value) {
-              setState(() {
-                _emailNotifications = value;
-              });
-            },
+            onChanged: _updateNotificationPreference,
+            activeColor: Theme.of(context).primaryColor,
           ),
 
           const Divider(),
 
-          // Section for Appearance
           _buildSectionHeader('Appearance'),
-          _buildDropdownTile(
-            title: 'Theme',
-            value: _theme,
-            items: ['Light', 'Dark', 'System'],
-            onChanged: (value) {
-              if (value != null) {
-                setState(() {
-                  _theme = value;
-                });
-                // TODO: Add logic to change the app's theme
-              }
-            },
+          SwitchListTile(
+            title: const Text('Dark Mode'),
+            subtitle: const Text('Enable dark theme'),
+            value: themeNotifier.isDarkMode,
+            onChanged: (_) => themeNotifier.toggleTheme(),
+            secondary: Icon(
+              themeNotifier.isDarkMode
+                  ? Icons.dark_mode_outlined
+                  : Icons.light_mode_outlined,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Helper widget for section headers
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
@@ -118,7 +131,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Helper widget for standard tappable tiles
   Widget _buildSettingsTile({
     required IconData icon,
     required String title,
@@ -130,45 +142,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: Text(title),
       subtitle: Text(subtitle),
       onTap: onTap,
-    );
-  }
-
-  // Helper widget for switch tiles
-  Widget _buildSwitchTile({
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return SwitchListTile(
-      title: Text(title),
-      subtitle: Text(subtitle),
-      value: value,
-      onChanged: onChanged,
-      activeColor: Theme.of(context).primaryColor,
-    );
-  }
-
-  // Helper widget for dropdown tiles
-  Widget _buildDropdownTile({
-    required String title,
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return ListTile(
-      title: Text(title),
-      trailing: DropdownButton<String>(
-        value: value,
-        underline: Container(), // Hides the default underline
-        items: items.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        onChanged: onChanged,
-      ),
     );
   }
 }

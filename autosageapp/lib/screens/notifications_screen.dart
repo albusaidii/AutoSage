@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-// Data model for a single notification
 class AppNotification {
+  final int userNotificationId;
   final String title;
   final String message;
   final DateTime time;
@@ -10,12 +13,13 @@ class AppNotification {
   bool isRead;
 
   AppNotification({
+    required this.userNotificationId,
     required this.title,
     required this.message,
     required this.time,
-    this.icon = Icons.notifications,
-    this.iconColor = Colors.blue,
-    this.isRead = false,
+    required this.icon,
+    required this.iconColor,
+    required this.isRead,
   });
 }
 
@@ -27,138 +31,219 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  // Sample list of notifications. In a real app, you would fetch this from a server.
-  final List<AppNotification> _notifications = [
-    AppNotification(
-      title: 'Service Reminder',
-      message: 'Your upcoming oil change is scheduled for this Friday.',
-      time: DateTime.now().subtract(const Duration(hours: 2)),
-      icon: Icons.calendar_today,
-      iconColor: Colors.blue,
-    ),
-    AppNotification(
-      title: 'New Diagnostic Report',
-      message: 'The chatbot has generated a new report for your vehicle.',
-      time: DateTime.now().subtract(const Duration(days: 1)),
-      icon: Icons.description,
-      iconColor: Colors.green,
-      isRead: true,
-    ),
-    AppNotification(
-      title: 'Tire Pressure Alert',
-      message: 'Low tire pressure detected in the front-left tire.',
-      time: DateTime.now().subtract(const Duration(days: 3)),
-      icon: Icons.warning,
-      iconColor: Colors.orange,
-      isRead: true,
-    ),
-  ];
+  final String baseUrl = "http://10.0.2.2:3000/api";
 
+  List<AppNotification> _notifications = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNotifications();
+  }
+
+  // ===============================
+  // FETCH NOTIFICATIONS
+  // ===============================
+  Future<void> fetchNotifications() async {
+    setState(() => isLoading = true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt("userId");
+
+      if (userId == null) {
+        setState(() => isLoading = false);
+        return;
+      }
+
+      final res =
+      await http.get(Uri.parse("$baseUrl/notifications/$userId"));
+
+      if (res.statusCode == 200) {
+        final List data = jsonDecode(res.body);
+
+        _notifications = data.map<AppNotification>((n) {
+          return AppNotification(
+            userNotificationId: n["id"],
+            title: n["title"],
+            message: n["message"],
+            time: DateTime.parse(n["created_at"]),
+            icon: _iconFromString(n["icon"]),
+            iconColor: _colorFromString(n["icon_color"]),
+            isRead: n["is_read"] == 1,
+          );
+        }).toList();
+      }
+    } catch (e) {
+      debugPrint("Notification fetch error: $e");
+    }
+
+    if (mounted) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  // ===============================
+  // MARK ONE AS READ
+  // ===============================
+  Future<void> markAsRead(AppNotification notification) async {
+    if (notification.isRead) return;
+
+    await http.put(
+      Uri.parse(
+          "$baseUrl/notifications/${notification.userNotificationId}/read"),
+    );
+
+    setState(() {
+      notification.isRead = true;
+    });
+  }
+
+  // ===============================
+  // MARK ALL AS READ (FIXED)
+  // ===============================
+  Future<void> markAllAsRead() async {
+    for (final n in _notifications.where((n) => !n.isRead)) {
+      await http.put(
+        Uri.parse("$baseUrl/notifications/${n.userNotificationId}/read"),
+      );
+      n.isRead = true;
+    }
+
+    setState(() {});
+  }
+
+  // ===============================
+  // UI
+  // ===============================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: const Text("Notifications"),
         actions: [
-          // Optional: Add a "Mark all as read" button
           if (_notifications.any((n) => !n.isRead))
             IconButton(
               icon: const Icon(Icons.done_all),
-              onPressed: () {
-                setState(() {
-                  for (var notification in _notifications) {
-                    notification.isRead = true;
-                  }
-                });
-              },
-              tooltip: 'Mark all as read',
+              tooltip: "Mark all as read",
+              onPressed: markAllAsRead,
             ),
         ],
       ),
-      body: _notifications.isEmpty
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _notifications.isEmpty
           ? _buildEmptyState()
           : _buildNotificationList(),
     );
   }
 
-  // Widget to display when there are no notifications
+  // ===============================
+  // EMPTY STATE
+  // ===============================
   Widget _buildEmptyState() {
+    final color =
+    Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.6);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.notifications_off_outlined,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.notifications_off_outlined,
+              size: 80, color: Theme.of(context).disabledColor),
           const SizedBox(height: 20),
-          Text(
-            'No Notifications',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text("No Notifications",
+              style: TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.bold, color: color)),
           const SizedBox(height: 10),
-          Text(
-            'You are all caught up!',
-            style: TextStyle(fontSize: 16, color: Colors.grey[500]),
-          ),
+          Text("You are all caught up!",
+              style: TextStyle(fontSize: 16, color: color)),
         ],
       ),
     );
   }
 
-  // Widget to display the list of notifications
+  // ===============================
+  // LIST
+  // ===============================
   Widget _buildNotificationList() {
+    final isDark =
+        Theme.of(context).brightness == Brightness.dark;
+
     return ListView.builder(
       itemCount: _notifications.length,
       itemBuilder: (context, index) {
-        final notification = _notifications[index];
+        final n = _notifications[index];
+        final isUnread = !n.isRead;
+
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          elevation: 2,
+          color: isUnread && !isDark
+              ? Colors.blue.shade50
+              : isUnread && isDark
+              ? Colors.grey[800]
+              : null,
+          margin:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+              borderRadius: BorderRadius.circular(12)),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: notification.iconColor.withOpacity(0.1),
-              child: Icon(
-                notification.icon,
-                color: notification.iconColor,
-              ),
+              backgroundColor: n.iconColor.withOpacity(0.15),
+              child: Icon(n.icon, color: n.iconColor),
             ),
             title: Text(
-              notification.title,
+              n.title,
               style: TextStyle(
-                fontWeight:
-                notification.isRead ? FontWeight.normal : FontWeight.bold,
-              ),
+                  fontWeight:
+                  isUnread ? FontWeight.bold : FontWeight.normal),
             ),
-            subtitle: Text(notification.message),
-            trailing: !notification.isRead
-                ? const Icon(
-              Icons.circle,
-              color: Colors.blue,
-              size: 12,
-            )
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(n.message),
+            ),
+            trailing: isUnread
+                ? Icon(Icons.circle,
+                size: 12,
+                color: Theme.of(context).primaryColor)
                 : null,
-            onTap: () {
-              // Mark as read when tapped
-              setState(() {
-                notification.isRead = true;
-              });
-              // TODO: Navigate to a detailed view if necessary
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Tapped on "${notification.title}"')),
-              );
-            },
+            onTap: () => markAsRead(n),
           ),
         );
       },
     );
+  }
+
+  // ===============================
+  // HELPERS
+  // ===============================
+  IconData _iconFromString(String? icon) {
+    switch (icon) {
+      case "warning":
+        return Icons.warning;
+      case "offer":
+        return Icons.local_offer;
+      case "calendar":
+        return Icons.calendar_today;
+      case "celebration":
+        return Icons.celebration;
+      default:
+        return Icons.notifications;
+    }
+  }
+
+  Color _colorFromString(String? color) {
+    switch (color) {
+      case "green":
+        return Colors.green;
+      case "orange":
+        return Colors.orange;
+      case "purple":
+        return Colors.purple;
+      case "red":
+        return Colors.red;
+      default:
+        return Colors.blue;
+    }
   }
 }
