@@ -7,7 +7,6 @@ import '../services/auth_service.dart';
 import 'admin_login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -27,15 +26,13 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // Use addPostFrameCallback to show the SnackBar after the first frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Check if any arguments were passed from the previous route
       final message = ModalRoute.of(context)?.settings.arguments as String?;
       if (message != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message),
-            backgroundColor: Colors.green, // Use green for success messages
+            backgroundColor: Colors.green,
           ),
         );
       }
@@ -51,8 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -62,13 +61,13 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildHeader(),
+                  _buildHeader(isDark), // isDark to handle text color
                   const SizedBox(height: 40),
 
-                  _buildEmailField(),
+                  _buildEmailField(context),
                   const SizedBox(height: 16),
 
-                  _buildPasswordField(),
+                  _buildPasswordField(context),
                   const SizedBox(height: 12),
 
                   _buildForgotPasswordLink(),
@@ -77,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   _buildSignInButton(),
                   const SizedBox(height: 20),
 
-                  _buildSignUpLink(context),
+                  _buildSignUpLink(context, isDark),
                 ],
               ),
             ),
@@ -88,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // ================= HEADER =================
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isDark) {
     return Column(
       children: [
         GestureDetector(
@@ -120,18 +119,23 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 8),
         Text(
           'Sign in to continue to your account',
-          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          style: TextStyle(
+              fontSize: 16,
+              // Dynamic color for secondary text
+              color: isDark ? Colors.grey[400] : Colors.grey[600]
+          ),
         ),
       ],
     );
   }
 
   // ================= EMAIL =================
-  Widget _buildEmailField() {
+  Widget _buildEmailField(BuildContext context) {
     return TextFormField(
       controller: emailController,
       keyboardType: TextInputType.emailAddress,
       decoration: _buildInputDecoration(
+        context: context,
         hintText: 'Email Address',
         prefixIcon: Icons.alternate_email,
       ),
@@ -141,11 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // ================= PASSWORD =================
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(BuildContext context) {
     return TextFormField(
       controller: passwordController,
       obscureText: !_isPasswordVisible,
       decoration: _buildInputDecoration(
+        context: context,
         hintText: 'Password',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
@@ -191,11 +196,9 @@ class _LoginScreenState extends State<LoginScreen> {
           final result = await AuthService.login(
             emailController.text.trim(),
             passwordController.text.trim(),
-
           );
 
           if (!mounted) return;
-
 
           setState(() => _isLoading = false);
 
@@ -235,13 +238,9 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } catch (e) {
           if (!mounted) return;
-
           setState(() => _isLoading = false);
-
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Server error. Please try again."),
-            ),
+            const SnackBar(content: Text("Server error. Please try again.")),
           );
         }
       },
@@ -269,16 +268,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
-
-
   // ================= SIGN UP =================
-  Widget _buildSignUpLink(BuildContext context) {
+  Widget _buildSignUpLink(BuildContext context, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text("Don't have an account?",
-            style: TextStyle(color: Colors.grey[600])),
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600])),
         TextButton(
           onPressed: () {
             Navigator.pushReplacement(
@@ -295,6 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // ================= INPUT DECORATION =================
   InputDecoration _buildInputDecoration({
+    required BuildContext context,
     required String hintText,
     required IconData prefixIcon,
     Widget? suffixIcon,
@@ -304,7 +301,7 @@ class _LoginScreenState extends State<LoginScreen> {
       prefixIcon: Icon(prefixIcon),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: Colors.white,
+      fillColor: Theme.of(context).cardColor,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     );
   }

@@ -5,7 +5,6 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Getting theme information to adapt text colors
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -24,10 +23,6 @@ class PrivacyPolicyScreen extends StatelessWidget {
               style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Last Updated: 2024-05-21', // Remember to update this date
-              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
-            ),
             const SizedBox(height: 16),
             const Text(
               'Your privacy is important to us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application, AutoSage.',

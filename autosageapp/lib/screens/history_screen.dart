@@ -204,7 +204,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
 
-                  // 🗑 DELETE ICON (TOP-RIGHT)
                   Positioned(
                     top: 4,
                     right: 4,

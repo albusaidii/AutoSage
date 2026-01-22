@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:autosageapp/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
 import 'edit_profile.dart';
 import 'help_support_screen.dart';
 import 'notifications_screen.dart';

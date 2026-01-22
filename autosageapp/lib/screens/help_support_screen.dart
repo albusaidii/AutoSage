@@ -16,16 +16,12 @@ class HelpSupportScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          // 1. Search Bar
-          // MODIFICATION 1: Pass 'context' to the helper method
-
-          // ... (rest of the build method is unchanged)
           const Text(
             'Frequently Asked Questions',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          _buildFaqList(context), // Pass context here as well for theme awareness
+          _buildFaqList(context),
 
           const Divider(height: 48),
 
@@ -35,7 +31,7 @@ class HelpSupportScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _buildContactOption(
-            context: context, // Pass context
+            context: context,
             icon: Icons.email_outlined,
             title: 'Email Support',
             subtitle: 'Get help via email at support@autosage.com',
@@ -44,7 +40,7 @@ class HelpSupportScreen extends StatelessWidget {
             },
           ),
           _buildContactOption(
-            context: context, // Pass context
+            context: context,
             icon: Icons.phone_outlined,
             title: 'Call Us',
             subtitle: 'Speak to a support agent at +968 99887766',
@@ -81,7 +77,7 @@ class HelpSupportScreen extends StatelessWidget {
   }
 
 
-  // Helper widget for the FAQ list - Now theme-aware
+  // Helper widget for the FAQ list
   Widget _buildFaqList(BuildContext context) {
     final faqs = {
       'What are the benefits of using AutoSage?':
@@ -101,7 +97,7 @@ class HelpSupportScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget for contact options - Now theme-aware
+  // Helper widget for contact options
   Widget _buildContactOption({
     required BuildContext context,
     required IconData icon,
@@ -125,7 +121,7 @@ class HelpSupportScreen extends StatelessWidget {
   }
 }
 
-// A reusable widget for an expandable FAQ item - Now theme-aware
+// A reusable widget for an expandable FAQ item
 class FaqItem extends StatelessWidget {
   final String question;
   final String answer;
@@ -141,12 +137,12 @@ class FaqItem extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
-      // Adapt background color based on theme
+      // background color based on theme
       color: isDark ? Colors.grey[850] : Colors.grey[100],
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ExpansionTile(
-        // Adapt icon color
+        // icon color
         iconColor: Theme.of(context).colorScheme.secondary,
         collapsedIconColor: Theme.of(context).textTheme.bodySmall?.color,
         title: Text(

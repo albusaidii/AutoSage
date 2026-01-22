@@ -20,10 +20,6 @@ class SecurityPolicyScreen extends StatelessWidget {
               style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Last Updated: 2024-05-21',
-              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
-            ),
             const SizedBox(height: 16),
             const Text(
               'At AutoSage, the security of your account and personal information is a top priority. We employ a variety of measures to ensure your data is protected against unauthorized access, alteration, and disclosure.',

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/theme.dart';
+
 
 
 class GarageListItem extends StatefulWidget {
@@ -22,7 +22,7 @@ class _GarageListItemState extends State<GarageListItem> {
   @override
   Widget build(BuildContext context) {
     return Opacity(
-      opacity: widget.isActive ? 1.0 : 0.45, // 👈 shaded when disabled
+      opacity: widget.isActive ? 1.0 : 0.45, // shaded when disabled
       child: Card(
         elevation: widget.isActive ? 3 : 0,
         shape: RoundedRectangleBorder(
@@ -54,7 +54,7 @@ class _GarageListItemState extends State<GarageListItem> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          onTap: widget.onTap, // 🚫 null blocks navigation
+          onTap: widget.onTap, //  null blocks navigation
         ),
       ),
     );

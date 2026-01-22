@@ -126,7 +126,7 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
                       ),
                     ),
 
-                    // ID line (NEW) - you can remove this if you only want the badge
+
 
 
                     Text(email),

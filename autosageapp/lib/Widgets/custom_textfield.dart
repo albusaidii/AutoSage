@@ -4,14 +4,14 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final bool obscureText;
-  final bool isPassword; // Make sure this is defined
+  final bool isPassword;
 
   const CustomTextField({
     super.key,
     required this.controller,
     required this.hintText,
     this.obscureText = false,
-    this.isPassword = false, // Default to false
+    this.isPassword = false,
   });
 
   @override

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'chatbot_screen.dart';
 import 'garage_screen.dart';
 import 'history_screen.dart';
-// REMOVED: import '../utils/theme.dart'; (No longer needed for hard-coded colors)
+
 
 // Data model for the tips section
 class Tip {
@@ -20,7 +20,6 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
     this.onProfileTap,
-    // 2. Add fullName to the constructor and make it required
     required this.fullName,
   });
 
@@ -43,13 +42,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine if the current theme is dark
+    // Dark mode theme support
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      // 1. REMOVED: The hard-coded background color.
-      // It will now automatically use the scaffoldBackgroundColor from your theme.
-      // backgroundColor: const Color(0xFFF8F9FA),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -57,18 +53,17 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- Top Header ---
+                //  Top Header
                 _buildHeader(context, isDark),
                 const SizedBox(height: 30),
 
-                // --- Main Action: Diagnose Issue ---
+                //  Main Action: Diagnose Issue
                 _buildPrimaryActionCard(context, isDark),
                 const SizedBox(height: 30),
 
-                // --- Secondary Actions ---
+                //  Secondary Actions
                 Text(
                   'Quick Actions',
-                  // 2. UPDATED: Text color now adapts to the theme.
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -77,7 +72,7 @@ class HomeScreen extends StatelessWidget {
                 _buildSecondaryActionRow(context, isDark),
                 const SizedBox(height: 30),
 
-                // --- Recent Activity / History Section ---
+                //  Recent Activity / History Section
                 Text(
                   'Recent Activity',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -87,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildHistoryCard(context, isDark),
 
-                // --- "Tips & Insights" section ---
+                //  "Tips & Insights" section
                 const SizedBox(height: 30),
                 Text(
                   'Tips & Insights',
@@ -105,7 +100,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // --- Builder Methods ---
+  //  Builder Methods
 
   Widget _buildHeader(BuildContext context, bool isDark) {
     return Row(
@@ -114,7 +109,6 @@ class HomeScreen extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 3. Use the fullName variable in the Text widget
             Text('Hi, $fullName 👋',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -131,7 +125,6 @@ class HomeScreen extends StatelessWidget {
           customBorder: const CircleBorder(),
           child: CircleAvatar(
             radius: 24,
-            // 4. UPDATED: Profile icon background and color adapt to the theme.
             backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
             child: Icon(Icons.person,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -312,7 +305,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Renamed and updated the card to be theme-aware
 class _ThemedCard extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -336,9 +328,8 @@ class _ThemedCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: gradient,
-          // 7. UPDATED: Shadow adapts to the theme.
           boxShadow: isDark
-              ? null // No shadow in dark mode for a flatter look
+              ? null
               : [
             BoxShadow(
               color: Colors.grey.shade300,

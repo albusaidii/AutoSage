@@ -391,7 +391,7 @@ app.post("/api/request-deletion", (req, res) => {
       //  USER NOTIFICATION
       const title = "Account Deletion Requested";
       const message =
-        "Your request to delete your AutoSage account has been submitted and is pending admin approval.";
+        "Your request to delete your AutoSage account has been submitted and is pending admin approval. If you want to cancel your request, please contact support.";
 
       db.query(
         "INSERT INTO notifications (title, message, icon, icon_color) VALUES (?, ?, ?, ?)",

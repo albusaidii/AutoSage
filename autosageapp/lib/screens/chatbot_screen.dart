@@ -17,7 +17,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   List<Map<String, String>> messages = [];
   bool isLoading = false;
 
-  // ✅ Helper: detect numeric-only input
+  //  Helper: detect numeric-only input
   bool _isNumericOnly(String text) {
     return RegExp(r'^\s*\d+\s*$').hasMatch(text);
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Widgets/item_card.dart';
 import '../models/shop_models.dart';
-import 'item_details_screen.dart';
+
 
 class ShopItemsScreen extends StatefulWidget {
   final Shop shop;

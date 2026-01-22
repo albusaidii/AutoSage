@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import 'privacy_policy_screen.dart';
-// 1. Import the two new screens
+
 import 'security_policy_screen.dart';
 
 
@@ -17,7 +17,6 @@ class PrivacySecurityScreen extends StatefulWidget {
 }
 
 class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
-  // `appLockEnabled` is no longer used but can be kept for future implementation.
   bool appLockEnabled = false;
 
   @override
@@ -31,7 +30,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           // ================= SECURITY =================
           _buildSectionHeader('Security', context),
 
-          // 2. REPLACED the App Lock switch with two new navigation tiles
+
           _buildSettingsTile(
             context: context,
             icon: Icons.security_outlined,
@@ -93,8 +92,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     );
   }
 
-  // ... (The rest of your file remains exactly the same)
-  // ... (_buildSectionHeader, _buildSettingsTile, _showDataOptions, etc.)
+
   // ================= SECTION HEADER =================
   Widget _buildSectionHeader(String title, BuildContext context) {
     return Padding(

@@ -5,10 +5,9 @@ import 'admin_garage_management_screen.dart';
 import 'admin_reports_screen.dart';
 import 'app_settings_screen.dart';
 import 'login_screen.dart';
-// 1. IMPORT THE NEW SCREEN
 import 'admin_user_management_screen.dart';
 
-// --- Main Admin Screen (Dashboard) ---
+//  Main Admin Screen (Dashboard)
 class AdminScreen extends StatelessWidget {
   const AdminScreen({super.key});
 
@@ -45,7 +44,7 @@ class AdminScreen extends StatelessWidget {
     );
   }
 
-  // --- Builder Widgets ---
+  //  Builder Widgets
 
   Widget _buildHeader(BuildContext context) {
     return Column(
@@ -152,7 +151,7 @@ class AdminScreen extends StatelessWidget {
   }
 }
 
-// --- Helper Widgets and Data Models ---
+//  Helper Widgets and Data Models
 
 /// A data model for an admin action.
 class _AdminAction {

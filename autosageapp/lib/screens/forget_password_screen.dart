@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../utils/theme.dart';
 import 'reset_password_screen.dart';
-import 'login_screen.dart'; // Import the login screen
+import 'login_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -104,7 +104,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 12), // Add some space
 
-              // --- NEW WIDGET: Back to Login Button ---
               TextButton(
                 onPressed: () {
                   // Navigate back to the Login Screen.
@@ -115,7 +114,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 },
                 child: const Text('Back to Login'),
               ),
-              // --- END OF NEW WIDGET ---
             ],
           ),
         ),

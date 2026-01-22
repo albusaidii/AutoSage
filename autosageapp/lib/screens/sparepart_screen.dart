@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../models/shop_models.dart';
 import 'shop_items_screen.dart';
@@ -48,7 +47,7 @@ class _SparePartScreenState extends State<SparePartScreen> {
       ),
       body: Column(
         children: [
-          // This calls the one, correct _buildSearchBar method
+          // This calls the _buildSearchBar method
           _buildSearchBar(),
           Expanded(
             child: ListView.builder(
@@ -65,16 +64,16 @@ class _SparePartScreenState extends State<SparePartScreen> {
     );
   }
 
-  // --- Builder Widgets are defined inside the State class ---
+  //  Builder Widgets are defined inside the State class
 
   Widget _buildSearchBar() {
-    // This is the single, correct search bar widget builder
+    // This is the search bar widget builder
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: TextField(
-        controller: _searchController, // This now works correctly
+        controller: _searchController,
         style: TextStyle(color: isDark ? Colors.white : Colors.black87),
         decoration: InputDecoration(
           hintText: 'Search for a shop...',
@@ -95,7 +94,7 @@ class _SparePartScreenState extends State<SparePartScreen> {
     );
   }
 
-  // Dummy data method is also inside the State class
+  // This is the data source for the shops
   List<Shop> _getSampleShops() {
     return [
       Shop(
@@ -235,49 +234,49 @@ class _SparePartScreenState extends State<SparePartScreen> {
             name: 'OEM Hyundai Brake Pads',
             description: 'Front brake pads for Elantra, Sonata',
             price: 38.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71Z9QXv4wVL.jpg',
+            imageUrl: 'https://i.ebayimg.com/images/g/NTAAAOSwzHpnc-cC/s-l1200.png',
           ),
           Item(
             name: 'Kia Oil Filter',
             description: 'OEM oil filter – Sportage/Sorento',
             price: 6.50,
-            imageUrl: 'https://m.media-amazon.com/images/I/61X5Yc3ZQnL.jpg',
+            imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/81JYLkfM9NL.jpg',
           ),
           Item(
             name: 'Hyundai Ignition Coil',
             description: '1.6L / 2.0L engine OEM coil',
             price: 22.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61D7zZkK0-L.jpg',
+            imageUrl: 'https://jparauto.com/wp-content/uploads/2019/09/HYUNDAI-Genuine-Ignition-Coil-273002E000-1.jpg',
           ),
           Item(
             name: 'Kia Engine Air Filter',
             description: 'Genuine cabin/engine air filter',
             price: 12.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71lY3zR7tTL.jpg',
+            imageUrl: 'https://www.glynhopkinpartsonline.co.uk/cdn/shop/products/28113D3100_1024x1024.jpg?v=1666601629',
           ),
           Item(
             name: 'Hyundai Genuine Spark Plugs',
             description: 'Set of 4 – OEM plugs',
             price: 19.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61qCIfQtz7L.jpg',
+            imageUrl: 'https://images-cdn.ubuy.ae/694c45bc6846b509ce0136f4-genuine-hyundai-spark-plugs.jpg',
           ),
           Item(
-            name: 'Genuine Hyundai Timing Belt',
+              name: 'Genuine Hyundai Timing Belt',
             description: 'Timing belt for Accent / i10 engines',
             price: 42.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71T1X2eFQML.jpg',
+            imageUrl: 'https://i.ebayimg.com/images/g/EUYAAOSwh79a4HzR/s-l1200.jpg',
           ),
           Item(
             name: 'Kia Radiator Cap',
             description: 'OEM radiator pressure cap',
             price: 8.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61oYcUo7onL.jpg',
+            imageUrl: 'https://i5.walmartimages.com/asr/19006d48-2b8f-4c46-978c-9cb061c6002b.275e5e30777b652404ecb31aca3a75cb.jpeg?odnHeight=768&odnWidth=768&odnBg=FFFFFF',
           ),
           Item(
             name: 'Hyundai Fuel Pump',
             description: 'Fuel pump assembly for select models',
             price: 85.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71mPgBP4q-L.jpg',
+            imageUrl: 'https://api.hyundaimobisin.com/service/asset/part/Engine%20&%20Transmission/60-fuel-pump.jpg',
           ),
         ],
       ),
@@ -285,72 +284,73 @@ class _SparePartScreenState extends State<SparePartScreen> {
 
       Shop(
         id: 'shop4',
-        name: 'Gulf National Company LLC',
-        address: 'Ghala Sinaiyyah St, Opp. Al Ansari Building, Ghala Industrial Area, Muscat, Oman',
-        logoUrl: 'https://lh3.googleusercontent.com/gps-cs-s/AG0ilSwiQT0YIS71Qluqy3YWepA0KPI2MfaGuK-yTiiJK8EHPqlJ9EdYdCxcCGSon97QyVAglW1PZzvp0AmgHI8C7bhXRw49an68rl4aRt1m6txuSbgngifDPQhbrSUUKGsx2bBCcCRN=w243-h174-n-k-no-nu',
+        name: 'Bin Ali Siddiq Trading LLC',
+        address: 'Ruwi High Street, Near Ruwi Clock Tower, Muscat, Oman',
+        logoUrl: 'https://lh3.googleusercontent.com/p/AF1QipMdYYackh4MFx7jKfZwKI8P7B0HOQjgjE-TKYfD=w408-h306-k-no',
         items: [
           Item(
-            name: 'Perkins Diesel Engine Gasket Kit',
-            description: 'Full gasket set for Perkins diesel engines used in backhoes and heavy equipment',
-            price: 220.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61H9G91Rx+L.jpg',
+            name: 'ACDelco Car Battery 70Ah',
+            description: 'Maintenance-free automotive battery suitable for sedans and SUVs',
+            price: 55.00,
+            imageUrl: 'https://m.media-amazon.com/images/I/81-m1LM58vL.jpg',
           ),
           Item(
-            name: 'JCB Backhoe Loader Engine Filter Set',
-            description: 'Complete filter set including air, oil, and fuel filters for JCB backhoes',
-            price: 75.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61qk2m2a1HL.jpg',
+            name: 'Toyota Genuine Oil Filter',
+            description: 'Original oil filter for Toyota petrol engines',
+            price: 6.50,
+            imageUrl: 'https://www.roughtrax4x4.com/media/catalog/product/cache/2e40214fa5f73db0de2e012bf5578c08/o/i/oilf06_new-min_2.jpg',
           ),
           Item(
-            name: 'Volvo Excavator Hydraulic Seal Kit',
-            description: 'Seal replacement kit for Volvo excavator hydraulic cylinders',
-            price: 180.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71bUyZ8YqkL.jpg',
+            name: 'Nissan Engine Air Filter',
+            description: 'OEM replacement air filter for Nissan Patrol and Pickup models',
+            price: 9.00,
+            imageUrl: 'https://m.media-amazon.com/images/I/71gTsEIoVSL._AC_UF1000,1000_QL80_.jpg',
           ),
           Item(
-            name: 'Bobcat Loader Engine Oil Filter',
-            description: 'OEM-grade oil filter for Bobcat compact loaders',
+            name: 'Castrol GTX 20W-50 Engine Oil (4L)',
+            description: 'High-quality mineral engine oil for high-temperature conditions',
+            price: 14.00,
+            imageUrl: 'https://m.media-amazon.com/images/I/71zw0pAysXL.jpg_BO30,255,255,255_UF750,750_SR1910,1000,0,C_ZJPHNwYW4gZm9yZWdyb3VuZD0iIzBGMTExMSIgZm9udD0iQW1hem9uRW1iZXIgNjYiPjMuODwvc3Bhbj4=,60,875,420,420,0,0_PIRIOFOUR-medium-V2,TopLeft,190,885_ZJPHNwYW4gZm9yZWdyb3VuZD0iIzU2NTk1OSIgZm9udD0iQW1hem9uRW1iZXIgNjYiPig1KTwvc3Bhbj4=,650,875,420,420,0,0_QL100_.jpg',
+          ),
+          Item(
+            name: 'Bosch Spark Plugs (Set of 4)',
+            description: 'Standard spark plugs for petrol engines',
+            price: 12.00,
+            imageUrl: 'https://m.media-amazon.com/images/I/71DQv396G4L._AC_UF894,1000_QL80_.jpg',
+          ),
+          Item(
+            name: 'Mitsubishi Brake Pads – Front',
+            description: 'Front brake pad set for Mitsubishi Pajero',
             price: 28.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61tYzNFS1gL.jpg',
+            imageUrl: 'https://autopartsdirect.com.sg/wp-content/uploads/2017/08/mitsubishi-bp-mz690563-3.jpg',
           ),
           Item(
-            name: 'Isuzu Heavy Duty Fuel Injection Pump',
-            description: 'High-pressure fuel injection pump for Isuzu diesel engines',
-            price: 450.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71dUOxiKNML.jpg',
+            name: 'Fan Belt – Toyota Hilux',
+            description: 'High-durability rubber fan belt for Toyota Hilux engines',
+            price: 7.50,
+            imageUrl: 'https://alliedautoonline.com.au/cdn/shop/files/DBS1003_46ada3be-fc13-4f82-ac0b-6321da2ec5ec.jpg?v=1749082124',
           ),
           Item(
-            name: 'Kubota Engine Air Filter Assembly',
-            description: 'Replacement air filter element for Kubota engines',
-            price: 34.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61xTzkrGd+L.jpg',
+            name: 'Coolant Concentrate – Red (4L)',
+            description: 'Long-life engine coolant suitable for Japanese vehicles',
+            price: 10.00,
+            imageUrl: 'https://best-performance.uk/web/image/product.template/82/image_1024?unique=daf2e7d',
           ),
           Item(
-            name: 'Perkins Alternator 24V',
-            description: 'Heavy-duty alternator for Perkins generator and machinery engines',
-            price: 185.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61Z8T4TQG2L.jpg',
+            name: 'Fuel Filter – Isuzu Pickup',
+            description: 'Diesel fuel filter for Isuzu D-Max models',
+            price: 8.00,
+            imageUrl: 'https://southernindustrial.store/wp-content/uploads/2022/12/898037-481-A2ee.jpg',
           ),
           Item(
-            name: 'Transmission Drive Belt for JCB',
-            description: 'OEM-standard drive belt used in JCB telehandlers and backhoes',
-            price: 36.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61hCZR5K49L.jpg',
-          ),
-          Item(
-            name: 'Volvo Excavator Engine Oil Cooler',
-            description: 'Engine oil cooler for select Volvo digging equipment',
-            price: 290.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71y917j1d6L.jpg',
-          ),
-          Item(
-            name: 'Starter Motor – Heavy Equipment',
-            description: 'High-torque starter motor for construction vehicles and loaders',
-            price: 135.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71+6cQByInL.jpg',
+            name: 'Brake Fluid DOT 4',
+            description: 'High-performance brake fluid for disc brake systems',
+            price: 4.50,
+            imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/71L0ed1AHKL.jpg',
           ),
         ],
       ),
+
 
       Shop(
         id: 'shop5',
@@ -362,61 +362,61 @@ class _SparePartScreenState extends State<SparePartScreen> {
             name: 'Michelin Latitude Tour Tyre – 235/55 R18',
             description: 'Premium SUV touring tyre',
             price: 150.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71M2V5s4QXL.jpg',
+            imageUrl: 'https://cdn.tiresleader.com/static/img/rw/tyre_medium_cp/michelin-latitude-tour-hp-934319.jpg',
           ),
           Item(
             name: 'Hankook Dynapro HP2 Tyre – 255/60 R18',
             description: 'All-season SUV tyre',
             price: 130.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61mJYsx7x9L.jpg',
+            imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKkAekE22SJ1U7C2YDWp7m_YQMUpDKPY__vg&s',
           ),
           Item(
             name: 'Amaron ProCar Battery – 12V 70Ah',
             description: 'Maintenance-free lead-acid battery',
             price: 65.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61WwQ8rQYTL.jpg',
+            imageUrl: 'https://www.yallatyre.com/media/catalog/product/cache/0ea92905d57cf770dae9c2d7396ce99b/a/m/amron-6.jpg',
           ),
           Item(
             name: 'Bosch S4 Battery – 12V 60Ah',
             description: 'High reliability car battery',
             price: 58.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61J5qgOaJkL.jpg',
+            imageUrl: 'https://media.autodoc.de/360_photos/1145175/h-preview.jpg',
           ),
           Item(
             name: 'Nitrogen Tyre Inflation',
             description: 'Nitrogen fill per tyre service',
             price: 2.50,
-            imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Nitrogen_tire_inflation.jpg',
+            imageUrl: 'https://static.wixstatic.com/media/9fba69_e1ced7f00f2341b19f5891d33470b3c2~mv2.png/v1/fill/w_640,h_448,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/9fba69_e1ced7f00f2341b19f5891d33470b3c2~mv2.png',
           ),
           Item(
             name: 'Wheel Balancing Service',
             description: 'Precision balancing to reduce vibration',
             price: 5.00,
-            imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/36/Wheel_balancing_machine.jpg',
+            imageUrl: 'https://cdn.prod.website-files.com/644718ad710589c59bf8fe59/67a6308ddae3222c987b10e9_shutterstock_2070562508.jpg',
           ),
           Item(
             name: 'Wheel Alignment',
             description: 'Front & rear alignment',
             price: 12.00,
-            imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Wheel_alignment_throw.jpg',
+            imageUrl: 'https://www.gotodobbs.com/wp-content/uploads/2023/04/Car-on-stand-with-sensors-on-wheels-for-wheels-alignment-camber-check-in-workshop-of-Service-station.jpg',
           ),
           Item(
             name: 'Tyre Valve Stems (Set of 4)',
             description: 'Replacement tyre valve stems',
             price: 3.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61u1MHtgCwL.jpg',
+            imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/31ELt6sfgcL._UL500_.jpg',
           ),
           Item(
             name: 'Portable Jump Starter Kit',
             description: 'Emergency jump start power pack',
             price: 35.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61cJ+dT3WHL.jpg',
+            imageUrl: 'https://www.utvstereo.com/cdn/shop/files/UTVS-JMP-STRT_1.png?v=1761260027&width=1080',
           ),
           Item(
             name: 'Wheel Nut Set (20pcs)',
             description: 'Steel wheel nuts for common rims',
-            price: 8.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61YxBr4QjkL.jpg',
+            price: 30.00,
+            imageUrl: 'https://ae01.alicdn.com/kf/Sea35c5648ed9429a978bd1df25fbb484v.png',
           ),
         ],
       ),
@@ -433,79 +433,79 @@ class _SparePartScreenState extends State<SparePartScreen> {
             name: 'Bosch Front Brake Discs (Pair)',
             description: 'Ventilated brake discs for Toyota & Nissan sedans',
             price: 52.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71FfwRyk6mL.jpg',
+            imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/71QZMmkYpAL._UL500_.jpg',
           ),
           Item(
-            name: 'Front Brake Pads – Ceramic',
-            description: 'Low-noise ceramic pads for Japanese vehicles',
+            name: 'Bosch Front Brake Pads – Ceramic',
+            description: 'Low-noise ceramic pads for German vehicles',
             price: 34.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61J8HYNAGTL.jpg',
+            imageUrl: 'https://www.boschautoparts.com/documents/647135/656978/BluePadsPkg_PDP_Carousel.jpg',
           ),
           Item(
             name: 'Wheel Bearing Kit',
             description: 'Front wheel bearing kit with hub',
             price: 38.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71zf6p88eQL.jpg',
+            imageUrl: 'https://www.roughtrax4x4.com/media/catalog/product/cache/2e40214fa5f73db0de2e012bf5578c08/r/w/rwbk005gen_01.jpg',
           ),
           Item(
             name: 'Lower Control Arm',
             description: 'Suspension control arm for Toyota Camry / Altima',
             price: 55.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61uY9uN2YML.jpg',
+            imageUrl: 'https://m.media-amazon.com/images/I/61afsDj1IhL._AC_UF1000,1000_QL80_.jpg',
           ),
           Item(
             name: 'Tie Rod End',
             description: 'Outer tie rod end for steering systems',
             price: 14.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61Z4Z6y+vDL.jpg',
+            imageUrl: 'https://www.carlisuspension.com/wp-content/uploads/2023/08/CS-BRS-21.jpg',
           ),
           Item(
             name: 'Shock Absorber – Front',
-            description: 'Gas-filled front shock absorber',
+            description: 'Altima Gas-filled front shock absorber',
             price: 48.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71oD9fhMnjL.jpg',
+            imageUrl: 'https://m.media-amazon.com/images/I/71gI98rxaHL.jpg',
           ),
           Item(
             name: 'Radiator Cooling Fan',
             description: 'Electric cooling fan assembly',
             price: 65.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71t6Z0ZzqPL.jpg',
+            imageUrl: 'https://images-na.ssl-images-amazon.com/images/I/716xuou7kTL._UL500_.jpg',
           ),
           Item(
-            name: 'Engine Thermostat',
+              name: 'Engine Thermostat',
             description: 'Cooling system thermostat (82°C)',
             price: 16.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61XIFcZ5LTL.jpg',
+            imageUrl: 'https://savree-storage.s3.amazonaws.com/Articles/optimised/engine-thermostat.jpg',
           ),
           Item(
             name: 'Fuel Filter',
             description: 'In-line fuel filter for petrol engines',
             price: 9.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61M9gFUnGSL.jpg',
+            imageUrl: 'https://www.thenissanfigaroshop.co.uk/parts-department/wp-content/uploads/2021/01/27572.jpg',
           ),
           Item(
             name: 'Automatic Transmission Filter',
             description: 'Transmission oil filter for Japanese cars',
             price: 22.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61XwD8lq2ZL.jpg',
+            imageUrl: 'Transmission oil filter for Japanese cars',
           ),
           Item(
             name: 'Drive Shaft (CV Axle)',
             description: 'Complete CV axle assembly – front',
             price: 78.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71z+0g0ZpRL.jpg',
+            imageUrl: 'https://m.media-amazon.com/images/I/71dSxYQlB9L.jpg',
           ),
           Item(
-            name: 'Engine Oil – 5W-30 (4L)',
+            name: 'Castrol Engine Oil – 5W-30 (4L)',
             description: 'Fully synthetic engine oil',
             price: 21.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/71h7t8Kp6nL.jpg',
+            imageUrl: 'https://statuscarcare.com/cdn/shop/files/5w30-c2-4l.png?v=1725192134',
           ),
           Item(
             name: 'Power Steering Pump',
             description: 'Hydraulic power steering pump',
             price: 95.00,
-            imageUrl: 'https://m.media-amazon.com/images/I/61zH0vW4VXL.jpg',
+            imageUrl: 'https://minit-tune.com/wp-content/uploads/2022/08/MinitTune_PowerSteeringPump.docx.jpg',
           ),
         ],
       ),
@@ -516,7 +516,7 @@ class _SparePartScreenState extends State<SparePartScreen> {
   }
 } // This curly brace closes the _SparePartScreenState class
 
-// --- The _ShopCard Widget is separate and self-contained ---
+//  The _ShopCard Widget is separate and self-contained
 
 class _ShopCard extends StatelessWidget {
   final Shop shop;
@@ -572,12 +572,12 @@ class _ShopCard extends StatelessWidget {
                   children: [
                     Text(
                       shop.name,
-                      maxLines: 2, // Allow text to wrap
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : Colors.black87,
-                        fontSize: 20, // Adjusted font size slightly
+                        fontSize: 20,
                         shadows: [
                           Shadow(
                               blurRadius: 2.0,
@@ -595,7 +595,7 @@ class _ShopCard extends StatelessWidget {
                           size: 16,
                         ),
                         const SizedBox(width: 4),
-                        Expanded( // Allow address to take available space and wrap if needed
+                        Expanded(
                           child: Text(
                             shop.address,
                             overflow: TextOverflow.ellipsis,

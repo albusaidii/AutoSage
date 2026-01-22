@@ -8,7 +8,6 @@ class SignUpScreen extends StatefulWidget {
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
-
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
@@ -38,8 +37,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      // Changed: Use theme background color instead of hardcoded grey
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -49,28 +51,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildHeader(),
+                  _buildHeader(isDark),
                   const SizedBox(height: 40),
 
-                  _buildUsernameField(),
+                  _buildUsernameField(context),
                   const SizedBox(height: 16),
 
-                  _buildEmailField(),
+                  _buildEmailField(context),
                   const SizedBox(height: 16),
 
-                  _buildPhoneNumberField(),
+                  _buildPhoneNumberField(context),
                   const SizedBox(height: 16),
 
-                  _buildPasswordField(),
+                  _buildPasswordField(context),
                   const SizedBox(height: 16),
 
-                  _buildConfirmPasswordField(),
+                  _buildConfirmPasswordField(context),
                   const SizedBox(height: 30),
 
                   _buildSignUpButton(),
                   const SizedBox(height: 20),
 
-                  _buildSignInLink(context),
+                  _buildSignInLink(context, isDark),
                 ],
               ),
             ),
@@ -83,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // ===========================
   // HEADER
   // ===========================
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isDark) {
     return Column(
       children: [
         Container(
@@ -91,7 +93,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           width: 100,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xEB419BFB), Color(0xFF023E61).withOpacity(0.1)],
+              colors: [const Color(0xEB419BFB), const Color(0xFF023E61).withOpacity(0.1)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -101,20 +103,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         const SizedBox(height: 20),
 
-        const Text(
+        Text(
           'Create Your Account',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF333333),
+            // Changed: Text color adapts to theme
+            color: isDark ? Colors.white : const Color(0xFF333333),
           ),
         ),
         const SizedBox(height: 8),
 
         Text(
           'Join the AutoSage community today!',
-          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          style: TextStyle(
+              fontSize: 16,
+              // Changed: Subtitle color is lighter in dark mode
+              color: isDark ? Colors.grey[400] : Colors.grey[600]
+          ),
           textAlign: TextAlign.center,
         ),
       ],
@@ -124,10 +131,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // ===========================
   // INPUT FIELDS
   // ===========================
-  Widget _buildUsernameField() {
+  Widget _buildUsernameField(BuildContext context) {
     return TextFormField(
       controller: nameController,
       decoration: _buildInputDecoration(
+        context: context,
         hintText: 'Full Name',
         prefixIcon: Icons.person_outline,
       ),
@@ -135,10 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (value == null || value.isEmpty) {
           return 'Please enter your name';
         }
-        final nameRegex = RegExp(
-          r'^[a-zA-Z]',
-        );
-
+        final nameRegex = RegExp(r'^[a-zA-Z]');
         if (!nameRegex.hasMatch(value)) {
           return 'Enter a valid name';
         }
@@ -147,109 +152,79 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildEmailField(BuildContext context) {
     return TextFormField(
       controller: emailController,
       keyboardType: TextInputType.emailAddress,
       decoration: _buildInputDecoration(
+        context: context,
         hintText: 'Email Address',
         prefixIcon: Icons.alternate_email,
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Email is required';
-        }
-
-        final emailRegex = RegExp(
-          r'^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-        );
-
-        if (!emailRegex.hasMatch(value)) {
-          return 'Enter a valid email address';
-        }
-
+        if (value == null || value.isEmpty) return 'Email is required';
+        final emailRegex = RegExp(r'^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        if (!emailRegex.hasMatch(value)) return 'Enter a valid email address';
         return null;
       },
     );
   }
 
-  Widget _buildPhoneNumberField() {
+  Widget _buildPhoneNumberField(BuildContext context) {
     return TextFormField(
       controller: phoneController,
       keyboardType: TextInputType.phone,
       decoration: _buildInputDecoration(
+        context: context,
         hintText: '+968 Phone Number',
         prefixIcon: Icons.phone_outlined,
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Phone number is required';
-        }
-        if (value.length != 8) {
-          return 'Phone number must be 8 digits';
-        }
-        if (!value.startsWith('9') && !value.startsWith('7')) {
-          return 'Phone number must start with 7 or 9';
-        }
+        if (value == null || value.isEmpty) return 'Phone number is required';
+        if (value.length != 8) return 'Phone number must be 8 digits';
+        if (!value.startsWith('9') && !value.startsWith('7')) return 'Must start with 7 or 9';
         return null;
       },
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(BuildContext context) {
     return TextFormField(
       controller: _passwordController,
       obscureText: !_isPasswordVisible,
       decoration: _buildInputDecoration(
+        context: context,
         hintText: 'Password',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-            color: Colors.grey[600],
           ),
-          onPressed: () {
-            setState(() {
-              _isPasswordVisible = !_isPasswordVisible;
-            });
-          },
+          onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
         ),
       ),
-      validator: (value) {
-        if (value == null || value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-        return null;
-      },
+      validator: (value) => value == null || value.length < 6 ? 'Min 6 characters' : null,
     );
   }
 
-  Widget _buildConfirmPasswordField() {
+  Widget _buildConfirmPasswordField(BuildContext context) {
     return TextFormField(
       controller: _confirmPasswordController,
       obscureText: !_isConfirmPasswordVisible,
       decoration: _buildInputDecoration(
+        context: context,
         hintText: 'Confirm Password',
         prefixIcon: Icons.lock_outline,
         suffixIcon: IconButton(
           icon: Icon(
             _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
-            color: Colors.grey[600],
           ),
-          onPressed: () {
-            setState(() {
-              _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-            });
-          },
+          onPressed: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
         ),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please confirm your password';
-        }
-        if (value != _passwordController.text) {
-          return 'Passwords do not match';
-        }
+        if (value == null || value.isEmpty) return 'Please confirm your password';
+        if (value != _passwordController.text) return 'Passwords do not match';
         return null;
       },
     );
@@ -274,29 +249,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
           _passwordController.text,
         );
 
-        // This check ensures you don't try to update a widget that's no longer on screen
         if (!mounted) return;
-
         setState(() => _isLoading = false);
 
         if (result['message'] == 'User registered successfully') {
-          // MODIFIED: Navigate to LoginScreen with a success message
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => const LoginScreen(),
-              // Pass the message as a route setting
               settings: const RouteSettings(
                 arguments: 'Account created successfully! Please sign in.',
               ),
             ),
           );
         } else {
-          // This part remains the same, shows an error if signup fails
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(result['message'] ?? 'An unknown error occurred.'),
-              backgroundColor: Colors.red, // Good to add color for errors
+              backgroundColor: Colors.red,
             ),
           );
         }
@@ -311,28 +281,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ? const SizedBox(
         height: 22,
         width: 22,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: Colors.white,
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
       )
-          : const Text(
-        'SIGN UP',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
+          : const Text('SIGN UP', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
     );
   }
-
-
 
   // ===========================
   // SIGN-IN LINK
   // ===========================
-  Widget _buildSignInLink(BuildContext context) {
+  Widget _buildSignInLink(BuildContext context, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Already have an account?", style: TextStyle(color: Colors.grey[600])),
+        Text(
+            "Already have an account?",
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600])
+        ),
         TextButton(
           onPressed: () {
             Navigator.pushReplacement(
@@ -353,23 +318,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // INPUT DECORATION
   // ===========================
   InputDecoration _buildInputDecoration({
+    required BuildContext context,
     required String hintText,
     required IconData prefixIcon,
     Widget? suffixIcon,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InputDecoration(
       hintText: hintText,
-      prefixIcon: Icon(prefixIcon, color: Colors.grey[600]),
+      prefixIcon: Icon(prefixIcon, color: isDark ? Colors.grey[400] : Colors.grey[600]),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: Colors.white,
+      fillColor: Theme.of(context).cardColor,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey.shade300),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: isDark ? Colors.grey[800]! : Colors.grey.shade300),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

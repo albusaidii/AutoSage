@@ -29,10 +29,10 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'C:/Users/USER/AutoSage/autosageapp/lib/images/logo.png', // Path to your logo
+              'C:/Users/USER/AutoSage/autosageapp/lib/images/logo.png',
               width: 200,
               height: 200,
-            ),            const SizedBox(height: 20),
+            ), const SizedBox(height: 20),
             const SizedBox(height: 10),
             const CircularProgressIndicator(color: Colors.white),
           ],

@@ -23,11 +23,11 @@ class _FeatureCardState extends State<FeatureCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Use an AnimatedContainer for a smooth transition
+    // Used an AnimatedContainer for a smooth transition
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200), // Controls the speed of the animation
       curve: Curves.easeInOut, // Makes the animation feel smooth
-      // Use Transform.scale to make the widget bigger
+      // Used Transform.scale to make the widget bigger
       transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
       transformAlignment: Alignment.center,
       child: MouseRegion(

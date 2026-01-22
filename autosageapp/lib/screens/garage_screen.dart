@@ -69,7 +69,7 @@ class _GarageScreenState extends State<GarageScreen> {
                 itemBuilder: (context, i) {
                   final g = garages[i];
 
-                  // IMPORTANT: backend returns 0 / 1
+                  // backend returns 0 / 1
                   final bool isActive = g['is_active'] == 1;
 
                   return GarageListItem(
@@ -92,7 +92,7 @@ class _GarageScreenState extends State<GarageScreen> {
                         ),
                       );
                     }
-                        : null, // 🚫 disabled garages blocked
+                        : null, //  disabled garages blocked
                   );
                 },
               ),
