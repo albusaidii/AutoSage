@@ -9,7 +9,7 @@ import 'utils/theme.dart';
 
 void main() {
   runApp(
-    // The ChangeNotifierProvider wraps your entire application.
+    // The ChangeNotifierProvider wraps the entire application.
     ChangeNotifierProvider(
       create: (_) => ThemeNotifier(),
       child: const AutoSageApp(),
@@ -17,7 +17,7 @@ void main() {
   );
 }
 
-// This is the root widget of your application.
+// This is the root widget of my application.
 class AutoSageApp extends StatelessWidget {
   const AutoSageApp({super.key});
 
@@ -29,9 +29,9 @@ class AutoSageApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'AutoSage',
-          themeMode: themeNotifier.themeMode, // This is the crucial line for theme switching.
+          themeMode: themeNotifier.themeMode, // This is the line for theme switching.
 
-          // --- Define your Light Theme ---
+          // Light Theme (default)
           theme: ThemeData(
             brightness: Brightness.light,
             primaryColor: primaryColor, // from your theme.dart
@@ -42,10 +42,9 @@ class AutoSageApp extends StatelessWidget {
               titleTextStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87, fontSize: 20),
               iconTheme: IconThemeData(color: Colors.black87),
             ),
-            // Define other light theme properties here
           ),
 
-          // --- Define your Dark Theme ---
+          // Dark Theme
           darkTheme: ThemeData(
             brightness: Brightness.dark,
             primaryColor: primaryColor,
@@ -56,13 +55,8 @@ class AutoSageApp extends StatelessWidget {
               titleTextStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
               iconTheme: IconThemeData(color: Colors.white),
             ),
-            // Define other dark theme properties here
           ),
-
-          // Use SplashScreen as the initial route. It will navigate to MainPage.
           home: const SplashScreen(),
-          // NOTE: When you navigate from Login/Signup to MainPage, you will now do this:
-          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MainPage(fullName: "the user's name from login")));
         );
       },
     );
@@ -71,10 +65,9 @@ class AutoSageApp extends StatelessWidget {
 
 // MainPage holds the Bottom Navigation Bar and manages the main screens.
 class MainPage extends StatefulWidget {
-  // 1. ADD A PROPERTY TO RECEIVE THE FULL NAME
+
   final String fullName;
 
-  // 2. UPDATE THE CONSTRUCTOR TO REQUIRE THE FULL NAME
   const MainPage({super.key, required this.fullName});
 
   @override
@@ -97,7 +90,6 @@ class _MainPageState extends State<MainPage> {
       HomeScreen(
         // This callback allows HomeScreen to tell MainPage to switch tabs.
         onProfileTap: () => _onItemTapped(2),
-        // 3. USE THE FULL NAME FROM THE WIDGET'S STATE
         fullName: widget.fullName,
       ),
       const ChatbotScreen(),
@@ -114,8 +106,6 @@ class _MainPageState extends State<MainPage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: primaryColor,
-        // Let the theme decide the unselected color
-        // unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
